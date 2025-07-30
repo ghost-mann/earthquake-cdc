@@ -1,0 +1,56 @@
+version: '3.7'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+  kafka-connect:
+    # This image includes Debezium's MySQL/MariaDB connector and the Confluent JDBC Sink connector
+    image: debezium/connect:2.5
+    container_name: kafka-connect
+    ports:
+      - "8083:8083"
+    depends_on:
+      - kafka
+    environment:
+      BOOTSTRAP_SERVERS: 'kafka:29092'
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: my_connect_configs
+      OFFSET_STORAGE_TOPIC: my_connect_offsets
+      STATUS_STORAGE_TOPIC: my_connect_statuses
+      # Add the JDBC Sink Connector Jar to the plugin path
+      # The debezium/connect image does not bundle it by default.
+      # We download it here on startup.
+      CONNECT_PLUGIN_PATH: "/kafka/connect"
+      # Extra jars can be added here
+      # For example, to add the PostgreSQL JDBC Sink Connector:
+      # You can manually download the JAR and mount it, or use this trick:
+      
+    # The following is a 'hacky' but effective way to add the JDBC Sink plugin for this example.
+    # In production, you would build a custom Docker image.
+    command: >
+      bash -c '
+        echo "Installing Confluent JDBC Connector...";
+        confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:latest;
+        /etc/confluent/docker/run &
+        wait
+      '

@@ -14,3 +14,5 @@ endpoint > mariadb > kafka > postgresql > grafana
 3.**Debezium Connector** (Source): A Kafka Connect plugin that reads MariaDB's binlog, converts each change into a structured JSON message, and sends it to a Kafka topic.
 4.**Apache Kafka**: The central nervous system. A distributed, durable message broker that decouples the source (Debezium) from the sink (the PostgreSQL writer).
 5.**Kafka Connect JDBC Sink** (Sink): Another Kafka Connect plugin that subscribes to the Kafka topic, reads the change events, and applies them to the target PostgreSQL database.
+
+
