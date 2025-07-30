@@ -19,6 +19,9 @@ endpoint > mariadb > kafka > postgresql > grafana
 ### registering source connector
 curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" \
 http://localhost:8083/connectors/ \
--d @debezium-mariadb-source-config.json
+-d @connectors/debezium-mariadb-source-config.json
 
 ### registering sink connector
+curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" \
+http://localhost:8083/connectors/ \
+-d @jdbc-postgres-sink-config.json
