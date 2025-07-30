@@ -8,7 +8,7 @@ postgres_engine = create_engine("postgresql://postgres:root@localhost:5432/earth
 # Create Spark
 spark = SparkSession.builder \
     .appName("EarthquakePipeline") \
-    .config("spark.jars", "postgresql-42.7.7.jar,mariadb-java-client-3.3.1.jar") \
+    .config("spark.jars", "db drivers/mariadb-java-client-3.3.1.jar,db drivers/postgresql-42.7.7.jar") \
     .getOrCreate()
 
 print("Starting pipeline...")
