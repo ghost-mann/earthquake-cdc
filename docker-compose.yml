@@ -1,4 +1,3 @@
-# Note: The 'version' tag is obsolete and not needed.
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
@@ -23,7 +22,6 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       
   mariadb:
-    # --- CORRECTED INDENTATION ---
     image: mariadb:10.11
     container_name: earthquake_mariadb
     ports:
@@ -62,24 +60,29 @@ services:
       start_period: 20s
       
   kafka-connect:
-    image: confluentinc/cp-kafka-connect:latest
+    image: debezium/connect:2.4
     container_name: earthquake_kafka-connect
     ports:
       - "8083:8083"
     depends_on:
-      - kafka
-      - postgres
-      - mariadb
+      kafka:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      mariadb:
+        condition: service_healthy
     environment:
-      CONNECT_BOOTSTRAP_SERVERS: "kafka:9092"
-      CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
-      CONNECT_REST_PORT: 8083
-      CONNECT_GROUP_ID: "earthquake-cdc"
-      CONNECT_CONFIG_STORAGE_TOPIC: "earthquake-cdc-configs"
-      CONNECT_OFFSET_STORAGE_TOPIC: "earthquake-cdc-offsets"
-      CONNECT_STATUS_STORAGE_TOPIC: "earthquake-cdc-status"
-      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
-      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
-      CONNECT_PLUGIN_PATH: "/kafka/connect/debezium"
-    volumes:
-      - ./connectors:/kafka/connect/debezium
+      BOOTSTRAP_SERVERS: kafka:29092
+      GROUP_ID: earthquake-cdc
+      CONFIG_STORAGE_TOPIC: earthquake-cdc-configs
+      OFFSET_STORAGE_TOPIC: earthquake-cdc-offsets
+      STATUS_STORAGE_TOPIC: earthquake-cdc-status
+      CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      STATUS_STORAGE_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/connectors"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
