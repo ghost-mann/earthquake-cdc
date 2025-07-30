@@ -1,0 +1,18 @@
+{
+  "name": "earthquake-mariadb-source",
+  "config": {
+    "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+    "tasks.max": "1",
+    "database.hostname": "host.docker.internal",
+    "database.port": "3306",
+    "database.user": "root",
+    "database.password": "password",
+    "database.server.id": "184054",
+    "database.server.name": "mariadb_server",
+    "database.include.list": "earthquake",
+    "table.include.list": "earthquake.earthquake_data",
+    "database.history.kafka.bootstrap.servers": "kafka:29092",
+    "database.history.kafka.topic": "dbhistory.earthquake",
+    "include.schema.changes": "false"
+  }
+}
