@@ -1,0 +1,29 @@
+{
+  "name": "jdbc-postgres-sink",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+    "connection.url": "jdbc:postgresql://earthquake_postgres:5432/earthquake_sink",
+    "connection.user": "user",
+    "connection.password": "password",
+    "topics": "earthquake.earthquake.earthquake_data",
+    "table.name.format": "earthquake_events",
+    "auto.create": "true",
+    "auto.evolve": "true",
+    "insert.mode": "upsert",
+    "pk.mode": "record_key",
+    "pk.fields": "eq_id",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter.schemas.enable": "false",
+    "transforms": "TimestampConverter",
+    "transforms.TimestampConverter.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
+    "transforms.TimestampConverter.field": "eq_time",
+    "transforms.TimestampConverter.format": "yyyy-MM-dd HH:mm:ss.SSS",
+    "transforms.TimestampConverter.target.type": "Timestamp",
+    "batch.size": "100",
+    "max.retries": "10",
+    "retry.backoff.ms": "3000",
+    "db.timezone": "UTC"
+  }
+}
