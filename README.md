@@ -24,4 +24,4 @@ http://localhost:8083/connectors/ \
 ### registering sink connector
 curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" \
 http://localhost:8083/connectors/ \
--d @jdbc-postgres-sink-config.json
+-d @connectors/jdbc-postgres-sink-config.json
