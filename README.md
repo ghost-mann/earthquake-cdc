@@ -25,3 +25,12 @@ http://localhost:8083/connectors/ \
 curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" \
 http://localhost:8083/connectors/ \
 -d @connectors/jdbc-postgres-sink-config.json
+
+## listing available connector plugins
+curl -s http://localhost:8083/connector-plugins | jq
+
+## Test Kafka Connect REST API
+curl -s http://localhost:8083/ | jq
+
+## Check Kafka Connect status
+curl -s http://localhost:8083/connectors | jq
