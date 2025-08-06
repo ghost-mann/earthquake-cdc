@@ -1,15 +1,27 @@
-# Start with Confluent's official Kafka Connect image, which includes 'confluent-hub'.
+# Start with Confluent's official Kafka Connect image. 7.5.0 is a good choice.
 FROM confluentinc/cp-kafka-connect:7.5.0
 
-# --- Install Connectors using the confluent-hub utility ---
+# Copy the local connector zip files into the container's temporary directory.
+COPY confluentinc-kafka-connect-jdbc-10.8.4.zip /tmp/jdbc.zip
+COPY debezium-debezium-connector-mysql-3.1.2.zip /tmp/debezium.zip
 
-# Set versions for clarity and easy updates.
-# The Confluent JDBC connector is a general-purpose sink for any JDBC-compliant database.
-ENV JDBC_SINK_VERSION=10.7.6
+# --- THE FIX: PART 1 ---
+# Switch to the ROOT user temporarily to gain permissions for package installation.
+USER root
 
-# Use confluent-hub to install the connectors.
-# This is the recommended, idiomatic way to add connectors to this image.
-# It automatically handles placing the connector JARs in the correct plugin path.
-RUN confluent-hub install confluentinc/kafka-connect-jdbc:${JDBC_SINK_VERSION} --no-prompt
-    
-RUN confluent-hub install debezium/debezium-connector-mysql:latest --no-prompt
+#
+# The main installation RUN command will now execute as root.
+#
+RUN set -x && \
+    microdnf install -y unzip && \
+    mkdir -p /usr/share/confluent-hub-components/jdbc-connector && \
+    mkdir -p /usr/share/confluent-hub-components/debezium-mysql-connector && \
+    unzip /tmp/jdbc.zip -d /usr/share/confluent-hub-components/jdbc-connector && \
+    unzip /tmp/debezium.zip -d /usr/share/confluent-hub-components/debezium-mysql-connector && \
+    rm /tmp/*.zip && \
+    microdnf clean all
+
+# --- THE FIX: PART 2 ---
+# Switch back to the non-privileged 'appuser' for security.
+# This ensures the container runs as a non-root user.
+USER appuser
