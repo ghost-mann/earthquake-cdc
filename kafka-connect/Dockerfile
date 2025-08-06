@@ -5,23 +5,20 @@ FROM confluentinc/cp-kafka-connect:7.5.0
 COPY confluentinc-kafka-connect-jdbc-10.8.4.zip /tmp/jdbc.zip
 COPY debezium-debezium-connector-mysql-3.1.2.zip /tmp/debezium.zip
 
-# --- THE FIX: PART 1 ---
 # Switch to the ROOT user temporarily to gain permissions for package installation.
 USER root
 
 #
-# The main installation RUN command will now execute as root.
+# SIMPLIFIED & CORRECTED RUN COMMAND:
+# This unzips the archives directly into the components directory. Kafka Connect
+# will scan this path and find the subdirectory for each connector automatically.
 #
 RUN set -x && \
     microdnf install -y unzip && \
-    mkdir -p /usr/share/confluent-hub-components/jdbc-connector && \
-    mkdir -p /usr/share/confluent-hub-components/debezium-mysql-connector && \
-    unzip /tmp/jdbc.zip -d /usr/share/confluent-hub-components/jdbc-connector && \
-    unzip /tmp/debezium.zip -d /usr/share/confluent-hub-components/debezium-mysql-connector && \
+    unzip /tmp/jdbc.zip -d /usr/share/confluent-hub-components/ && \
+    unzip /tmp/debezium.zip -d /usr/share/confluent-hub-components/ && \
     rm /tmp/*.zip && \
     microdnf clean all
 
-# --- THE FIX: PART 2 ---
 # Switch back to the non-privileged 'appuser' for security.
-# This ensures the container runs as a non-root user.
 USER appuser

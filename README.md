@@ -34,3 +34,5 @@ curl -s http://localhost:8083/ | jq
 
 ## Check Kafka Connect status
 curl -s http://localhost:8083/connectors | jq
+
+curl -s http://localhost:8083/connector-plugins | jq '.[].class'
