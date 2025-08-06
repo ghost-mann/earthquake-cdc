@@ -1,0 +1,16 @@
+#
+# Custom MariaDB configuration for Debezium CDC
+#
+[mysqld]
+# Server ID must be unique for each server in a replication setup.
+server-id                = 100
+
+# Binlog format must be ROW for Debezium to read row-level changes.
+binlog_format            = ROW
+
+# Enable the binary log and specify the base name for log files.
+log_bin                  = mariadb-bin
+
+# Optional but recommended: Tells MariaDB which database to log changes for.
+# This can reduce the size of the binlog if you have many databases.
+binlog_do_db             = earthquake

@@ -50,13 +50,9 @@ services:
     ports:
       - "3306:3306"
     # Command arguments enable binary logging, which is required for Debezium CDC.
-    command:
-      - '--character-set-server=utf8mb4'
-      - '--collation-server=utf8mb4_unicode_ci'
-      - '--server-id=100'
-      - '--binlog-format=ROW'
-      - '--log-bin=mariadb-bin'
-      - '--binlog-do-db=earthquake'
+    volumes:
+      # This mounts your custom config file into the directory where MariaDB looks for it.
+      - ./mariadb_config:/etc/mysql/mariadb.conf.d
     environment:
       MARIADB_ROOT_PASSWORD: password
       MARIADB_DATABASE: earthquake
